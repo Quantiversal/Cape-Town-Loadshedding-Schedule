@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Loadshedding Schedule Demo</title>
+	<script src="loadshedding-table-generator.js"></script>
+</head>
+<body>
+	<!-- This layout is messy but I like keeping each example together -->
+	<script>var loadSheddingSchedule = new LoadSheddingSchedule();</script>
+
+	<p>Based on <a href="http://resource.capetown.gov.za/documentcentre/Documents/Procedures%2c%20guidelines%20and%20regulations/Load_Shedding_All_Areas_Schedule_and_Map.pdf">these tables</a></p>
+
+	<h2>On day 2 at time slot (row) 6 in Stage 1, what area is being load shed?</h2>
+	<p id="test1"></p>
+	<script>
+		document.getElementById('test1').innerHTML = loadSheddingSchedule.getAreaCodesByTimeSlot(1, 2, 6);
+	</script>
+
+	<h2>On day 15th at time slot (row) 3 in Stage 2, what area is being load shed?</h2>
+	<p id="test2"></p>
+	<script>
+		document.getElementById('test2').innerHTML = loadSheddingSchedule.getAreaCodesByTimeSlot(2, 15, 3);
+	</script>
+
+	<h2>On day 7th at 1:52 (24hr) in Stage 2, what areas are being load shed?</h2>
+	<p id="test3"></p>
+	<script>
+		document.getElementById('test3').innerHTML = loadSheddingSchedule.getAreaCodesByTimeValue(2, 7, new DayTime(1, 52));
+	</script>
+
+	<h2>On day 26th at 14:25 (24hr) in Stage 3, what areas are being load shed? (this time is where 2 stages overlap)</h2>
+	<p id="test4"></p>
+	<script>
+		document.getElementById('test4').innerHTML = loadSheddingSchedule.getAreaCodesByTimeValue(3, 26, new DayTime(14, 25), true);
+	</script>
+
+	<h2>On day 3rd in Stage 4, what time slots is area 11 being load shed?</h2>
+	<p id="test5"></p>
+	<script>
+		document.getElementById('test5').innerHTML = loadSheddingSchedule.getTimeSlotsByAreaCode(4, 3, 11);
+	</script>
+
+	<h2>Today in Stage 2, what is the status of area 11 is being load shed?</h2>
+	<p id="test6_text_a"></p>
+	<p id="test6_countdown_a"></p>
+	<p id="test6_text_b"></p>
+	<p id="test6_countdown_b"></p>
+	<script>
+		let area = 11;
+		// can get this from crawling eskom's website every 30 mins or whatever (out of the scope of this example)
+		let stage = 8;
+
+		function getTimeStats(endDateTime) {
+			// Get todays date and time
+			let now = new Date().getTime();
+			let distance = endDateTime - now;
+
+			return {
+				// Find the distance between now and the count down date
+				distance: distance,
+				// Time calculations for days, hours, minutes and seconds
+				days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+				hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+				minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+				seconds: Math.floor((distance % (1000 * 60)) / 1000)
+			};
+		}
+
+		let loadshedding = loadSheddingSchedule.isLoadSheddingNow(stage, area);
+		if(loadshedding.status) {
+			// Update the count down every 1 second
+			var y = setInterval(function() {
+				let stats = getTimeStats(loadshedding.endDate.getTime());
+
+				// Display the result in the element with id="demo"
+				document.getElementById('test6_countdown_a').innerHTML = 'ETA: ' + stats.days + "d " + stats.hours + "h "
+				+ stats.minutes + "m " + stats.seconds + "s ";
+
+				// If the count down is finished, write some text
+				if (stats.distance < 0) {
+					clearInterval(y);
+					document.getElementById('test6_countdown_a').innerHTML = "EXPIRED";
+				}
+			}, 1000);
+
+			document.getElementById('test6_text_a').innerHTML = 'In a loadshedding timeslot. Time left in loadhseding';
+		} else {
+			document.getElementById('test6_text_a').innerHTML = 'Not in loadshedding timeslot currently';
+		}
+
+		let nextSlot = loadSheddingSchedule.getNextTimeSlot(stage, area);
+		document.getElementById('test6_text_b').innerHTML += 'Next slot is on day ' + nextSlot.day + ', at time, ' + loadSheddingSchedule.getTimeSlotHour(nextSlot.slot) + ':00' + '<br>i.e. ' + nextSlot.date;
+
+		// Set the date we're counting down to
+		var countDownDate = nextSlot.date.getTime();
+		// Update the count down every 1 second
+		var x = setInterval(function() {
+			let stats = getTimeStats(countDownDate);
+
+			// Display the result in the element with id="demo"
+			document.getElementById('test6_countdown_b').innerHTML = 'ETA: ' + stats.days + "d " + stats.hours + "h "
+			+ stats.minutes + "m " + stats.seconds + "s ";
+
+			// If the count down is finished, write some text
+			if (stats.distance < 0) {
+				clearInterval(x);
+				document.getElementById('test6_countdown_b').innerHTML = "EXPIRED";
+			}
+		}, 1000);
+	</script>
+
+	<p>Honestly, this demo could be more impressive. Something like generating the tables using these functions but I'm not going to go that far. These functions should be all you need to get the right zone once you have got the current stage via scraping the Eskom website or whatever</p>
+</body>
+</html>
