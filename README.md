@@ -1,4 +1,4 @@
-# Cape-Town-Loadshedding-Schedule
+# Cape Town Loadshedding Schedule
 A class that can be used to fetch loadshedding times for Cape Town, South Africa based on Eskom stages 1-8. It does this all with maths instead of storing it all in tables. So the LoadSheddingSchedule class and the current Eskom loadshedding stage is all you need.
 Based on these tables: http://resource.capetown.gov.za/documentcentre/Documents/Procedures%2c%20guidelines%20and%20regulations/Load_Shedding_All_Areas_Schedule_and_Map.pdf
 
