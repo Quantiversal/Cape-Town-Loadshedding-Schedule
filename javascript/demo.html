@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>Loadshedding Schedule Demo</title>
-	<script src="loadshedding-table-generator.js"></script>
+	<script src="loadshedding-schedule.js"></script>
 </head>
 <body>
 	<!-- This layout is messy but I like keeping each example together -->
@@ -51,7 +51,7 @@
 	<script>
 		let area = 11;
 		// can get this from crawling eskom's website every 30 mins or whatever (out of the scope of this example)
-		let stage = 8;
+		let stage = 2;
 
 		function getTimeStats(endDateTime) {
 			// Get todays date and time

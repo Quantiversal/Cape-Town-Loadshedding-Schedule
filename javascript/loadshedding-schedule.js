@@ -24,7 +24,7 @@
 
 
 
-// this all makes a lot more sense when looking at the actual tables:
+// this all makes a lot ore sense when looking at the actual tables:
 // http://resource.capetown.gov.za/documentcentre/Documents/Procedures%2c%20guidelines%20and%20regulations/Load_Shedding_All_Areas_Schedule_and_Map.pdf
 
 // indecies are 1-based (not 0-based) because we are dealing with day dates, etc so it's just easier imo :)
